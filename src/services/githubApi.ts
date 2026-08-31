@@ -163,13 +163,37 @@ export async function fetchUserPublicRepos(
     if (res.status === 404) {
       throw new Error(`GitHub user "${owner}" not found.`);
     }
-    throw new Error(`Failed to fetch repositories for user "${owner}" (${res.status}): ${res.statusText}`);
+    throw new Error(`Failed to fetch public repositories for user "${owner}" (${res.status}): ${res.statusText}`);
   }
 
   const repos: GitHubRepoInfo[] = await res.json();
   return repos;
 }
 
+export async function fetchRepoReferrers(
+  owner: string,
+  repo: string,
+  token?: string
+): Promise<{ referrer: string; count: number; uniques: number }[]> {
+  if (!token) return [];
+
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token.trim()}`,
+  };
+
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/traffic/popular/referrers`, { headers });
+  if (!res.ok) return [];
+
+  const data = await res.json();
+  return Array.isArray(data)
+    ? data.map((item: any) => ({
+        referrer: item.referrer,
+        count: item.count,
+        uniques: item.uniques,
+      }))
+    : [];
+}
 
 export async function fetchGitHubReleases(
   owner: string,

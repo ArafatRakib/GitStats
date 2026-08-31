@@ -138,36 +138,50 @@ export function Header({
         </div>
 
         {/* ROW 2: Target Repository Link & Action Toolset */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between py-2 gap-2 text-xs">
+        <div className="flex items-center justify-between py-2 gap-2 text-xs">
           
-          {/* Target Repo Link */}
-          <div className="flex items-center space-x-2 min-w-0 shrink">
-            <a
-              href={owner && repo ? `https://github.com/${owner}/${repo}` : '#'}
-              target="_blank"
-              rel="noreferrer"
-              className="font-mono text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 font-semibold transition-colors bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/90 dark:hover:bg-slate-700/90 px-2.5 py-1 rounded-md border border-slate-200/70 dark:border-slate-700/70 max-w-[150px] xs:max-w-[200px] sm:max-w-none"
-              title={owner && repo ? `View ${owner}/${repo} on GitHub` : 'GitHub Repository'}
-            >
-              <span className="truncate">{owner && repo ? `${owner}/${repo}` : 'Select Repository'}</span>
-              <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
-            </a>
+          {/* Target Repo Link OR Search Trigger (Expands dynamically to fill available width) */}
+          <div className="flex-1 min-w-0">
+            {owner && repo ? (
+              <a
+                href={`https://github.com/${owner}/${repo}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between gap-1.5 font-semibold transition-colors bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/90 dark:hover:bg-slate-700/90 px-2.5 py-1 rounded-md border border-slate-200/70 dark:border-slate-700/70 w-full"
+                title={`View ${owner}/${repo} on GitHub`}
+              >
+                <span className="truncate">{owner}/${repo}</span>
+                <ExternalLink className="w-3 h-3 text-slate-400 shrink-0 ml-0.5" />
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen(true)}
+                className="inline-flex items-center justify-between space-x-1.5 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-md transition-colors border border-indigo-200 dark:border-indigo-800 shadow-2xs w-full"
+                title="Click to search and select a repository"
+              >
+                <div className="flex items-center space-x-1.5 min-w-0">
+                  <Search className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="truncate">Select Repository</span>
+                </div>
+              </button>
+            )}
           </div>
 
-                      {/* Action Buttons */}
-          <div className="flex items-center space-x-1.5 shrink-0 ml-auto sm:ml-0">
-            {!isSearchOpen && (
+          {/* Right Action Buttons */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
+            {owner && repo && !isSearchOpen && (
               <button
                 id="btn-switch-repo"
                 onClick={() => setIsSearchOpen(true)}
-                className="inline-flex items-center space-x-1 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md transition-colors border border-slate-200/80 dark:border-slate-700 shadow-2xs"
+                className="inline-flex items-center space-x-1 px-2 py-1 text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md transition-colors border border-slate-200/80 dark:border-slate-700 shadow-2xs"
                 title="Search User or Owner/Repo"
               >
-                <Search className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Search</span>
+                <Search className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
+                <span className="hidden xs:inline">Search</span>
               </button>
             )}
-            
+
             {/* GitHub Actions Automation Button */}
             <button
               id="btn-github-actions-modal"
@@ -190,7 +204,6 @@ export function Header({
               <span>Badges</span>
             </button>
           </div>
-
         </div>
 
 {/* Dedicated Mobile Search Row (Only visible when active on small screens) */}
