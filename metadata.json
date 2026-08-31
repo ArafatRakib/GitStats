@@ -1,0 +1,6 @@
+{
+  "name": "GitStats: Github Release Tracker",
+  "description": "Historical release download analytics, rate-limit safe periodic logger, and automated GitHub Actions metrics tracker for GitHub repositories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
