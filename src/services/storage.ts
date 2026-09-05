@@ -112,38 +112,37 @@ export function generateHistoricalBaseline(
 ): DownloadSnapshot[] {
   const points: DownloadSnapshot[] = [];
   const days = 30;
-  const currentTotal = currentSnap.totalDownloads || 1000;
+  // Scaled strictly to actual current total (no 1000 arbitrary minimum baseline)
+  const currentTotal = Math.max(0, currentSnap.totalDownloads);
   const now = new Date();
 
   for (let i = days; i >= 1; i--) {
     const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-    // Smooth S-curve / quadratic growth
+    // Smooth S-curve / quadratic growth capped strictly below currentTotal
     const progress = Math.pow((days - i) / days, 1.4);
-    // Add minor natural daily fluctuation
-    const jitter = 0.96 + Math.sin(i * 1.5) * 0.04;
-    const dayTotal = Math.max(0, Math.floor(currentTotal * progress * jitter));
+    const dayTotal = Math.min(currentTotal, Math.max(0, Math.floor(currentTotal * progress)));
 
     const relDownloads: Record<string, number> = {};
     const astDownloads: Record<string, number> = {};
     const osBreakdown = {
-      android: Math.floor((currentSnap.osBreakdown.android || 0) * progress * jitter),
-      iOS: Math.floor((currentSnap.osBreakdown.iOS || 0) * progress * jitter),
-      windows: Math.floor(currentSnap.osBreakdown.windows * progress * jitter),
-      macOS: Math.floor(currentSnap.osBreakdown.macOS * progress * jitter),
-      linux: Math.floor(currentSnap.osBreakdown.linux * progress * jitter),
-      source: Math.floor(currentSnap.osBreakdown.source * progress * jitter),
-      other: Math.floor(currentSnap.osBreakdown.other * progress * jitter),
+      android: Math.floor((currentSnap.osBreakdown.android || 0) * progress),
+      iOS: Math.floor((currentSnap.osBreakdown.iOS || 0) * progress),
+      windows: Math.floor((currentSnap.osBreakdown.windows || 0) * progress),
+      macOS: Math.floor((currentSnap.osBreakdown.macOS || 0) * progress),
+      linux: Math.floor((currentSnap.osBreakdown.linux || 0) * progress),
+      source: Math.floor((currentSnap.osBreakdown.source || 0) * progress),
+      other: Math.floor((currentSnap.osBreakdown.other || 0) * progress),
     };
 
     releases.forEach((r) => {
-      relDownloads[r.tag_name] = Math.floor((currentSnap.releaseDownloads[r.tag_name] || 0) * progress * jitter);
+      relDownloads[r.tag_name] = Math.floor((currentSnap.releaseDownloads[r.tag_name] || 0) * progress);
     });
 
     Object.keys(currentSnap.assetDownloads).forEach((k) => {
-      astDownloads[k] = Math.floor(currentSnap.assetDownloads[k] * progress * jitter);
+      astDownloads[k] = Math.floor(currentSnap.assetDownloads[k] * progress);
     });
 
-    const prevTotal = points.length > 0 ? points[points.length - 1].totalDownloads : Math.floor(dayTotal * 0.9);
+    const prevTotal = points.length > 0 ? points[points.length - 1].totalDownloads : 0;
 
     points.push({
       id: `snap_hist_${days - i}`,
@@ -158,8 +157,8 @@ export function generateHistoricalBaseline(
   }
 
   // Add the final real snapshot
-  const finalDelta = Math.max(0, currentSnap.totalDownloads - points[points.length - 1].totalDownloads);
-  currentSnap.deltaDownloads = finalDelta;
+  const prevPointTotal = points.length > 0 ? points[points.length - 1].totalDownloads : 0;
+  currentSnap.deltaDownloads = Math.max(0, currentSnap.totalDownloads - prevPointTotal);
   points.push(currentSnap);
 
   return points;

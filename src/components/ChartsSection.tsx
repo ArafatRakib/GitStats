@@ -162,79 +162,79 @@ export function ChartsSection({ releases, snapshots }: ChartsSectionProps) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs mb-8 overflow-hidden transition-colors">
       
-      {/* Tab Navigation Header */}
-      <div className="border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 pt-4 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+  {/* Tab Navigation Header (Scrollable on mobile) */}
+      <div className="border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 pt-3 flex flex-col md:flex-row md:items-center justify-between gap-2.5 bg-slate-50/50 dark:bg-slate-900/50">
         
-        {/* Main Tabs */}
-        <div className="flex items-center space-x-1 sm:space-x-2">
+        {/* Scrollable Main Tabs Container */}
+        <div className="flex items-center space-x-1 overflow-x-auto touch-pan-x whitespace-nowrap pb-1 md:pb-0 scrollbar-none">
           <button
             id="tab-btn-timeline"
             onClick={() => setActiveTab('timeline')}
-            className={`flex items-center space-x-2 px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px ${
+            className={`flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px shrink-0 touch-manipulation ${
               activeTab === 'timeline'
                 ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
             }`}
           >
-            <TrendingUp className="w-4 h-4" />
+            <TrendingUp className="w-3.5 h-3.5 shrink-0" />
             <span>Downloads Over Time</span>
           </button>
 
           <button
             id="tab-btn-releases"
             onClick={() => setActiveTab('releases')}
-            className={`flex items-center space-x-2 px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px ${
+            className={`flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px shrink-0 touch-manipulation ${
               activeTab === 'releases'
                 ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
             <span>Release Comparison</span>
           </button>
 
           <button
             id="tab-btn-os"
             onClick={() => setActiveTab('os')}
-            className={`flex items-center space-x-2 px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px ${
+            className={`flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px shrink-0 touch-manipulation ${
               activeTab === 'os'
                 ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
             }`}
           >
-            <PieIcon className="w-4 h-4" />
+            <PieIcon className="w-3.5 h-3.5 shrink-0" />
             <span>Platform / OS Share</span>
           </button>
 
           <button
             id="tab-btn-hourly"
             onClick={() => setActiveTab('hourly')}
-            className={`flex items-center space-x-2 px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px ${
+            className={`flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition border-b-2 -mb-px shrink-0 touch-manipulation ${
               activeTab === 'hourly'
                 ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
             }`}
           >
-            <Clock className="w-4 h-4" />
-            <span>Peak Activity Patterns</span>
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span>Peak Activity</span>
           </button>
         </div>
 
         {/* Tab Controls (Range and Mode) for Timeline */}
         {activeTab === 'timeline' && (
-          <div className="flex items-center space-x-2 pb-2 sm:pb-0">
+          <div className="flex flex-wrap items-center space-x-2 pb-2 md:pb-0 overflow-x-auto touch-pan-x">
             
             {/* Mode switch */}
             <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300">
               <button
                 onClick={() => setChartMode('cumulative')}
-                className={`px-2.5 py-1 rounded-md transition ${chartMode === 'cumulative' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-semibold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                className={`px-2 py-1 rounded-md transition touch-manipulation ${chartMode === 'cumulative' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-semibold' : 'hover:text-slate-900 dark:hover:text-white'}`}
               >
                 Cumulative
               </button>
               <button
                 onClick={() => setChartMode('daily')}
-                className={`px-2.5 py-1 rounded-md transition ${chartMode === 'daily' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-semibold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                className={`px-2 py-1 rounded-md transition touch-manipulation ${chartMode === 'daily' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-semibold' : 'hover:text-slate-900 dark:hover:text-white'}`}
               >
                 Daily Downloads
               </button>
@@ -246,7 +246,7 @@ export function ChartsSection({ releases, snapshots }: ChartsSectionProps) {
                 <button
                   key={r}
                   onClick={() => setTimelineRange(r)}
-                  className={`px-2 py-1 uppercase rounded-md transition ${timelineRange === r ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
+                  className={`px-2 py-1 uppercase rounded-md transition touch-manipulation ${timelineRange === r ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold' : 'hover:text-slate-900 dark:hover:text-white'}`}
                 >
                   {r}
                 </button>
@@ -256,7 +256,6 @@ export function ChartsSection({ releases, snapshots }: ChartsSectionProps) {
         )}
 
       </div>
-
       {/* Chart Canvas Area */}
       <div className="p-4 sm:p-6">
         
