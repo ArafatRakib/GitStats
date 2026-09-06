@@ -32,8 +32,25 @@ import { AlertCircle, RefreshCw, Sparkles, Workflow, ExternalLink } from 'lucide
 
 export default function App() {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [owner, setOwner] = useState('');
-  const [repo, setRepo] = useState('');
+  
+  // Parse initial owner and repo from URL query parameters (e.g. ?repo=ArafatRakib/ChronoCraft)
+  const [owner, setOwner] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const repoParam = params.get('repo');
+    if (repoParam && repoParam.includes('/')) {
+      return repoParam.split('/')[0];
+    }
+    return '';
+  });
+
+  const [repo, setRepo] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const repoParam = params.get('repo');
+    if (repoParam && repoParam.includes('/')) {
+      return repoParam.split('/')[1];
+    }
+    return '';
+  });
   const [token, setToken] = useState<string>(() => loadPersonalToken());
 
   const [repoInfo, setRepoInfo] = useState<GitHubRepoInfo | null>(null);
@@ -141,11 +158,17 @@ export default function App() {
     }
   };
   
-  const handleChangeRepo = (newOwner: string, newRepo: string) => {
+ const handleChangeRepo = (newOwner: string, newRepo: string) => {
     setOwner(newOwner);
     setRepo(newRepo);
-  };
 
+    // Synchronize URL search params so the page URL can be shared directly
+    if (newOwner && newRepo) {
+      const newUrl = `${window.location.pathname}?repo=${encodeURIComponent(newOwner)}/${encodeURIComponent(newRepo)}`;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
+    }
+  };
+  
   const handleUserLookup = async (username: string) => {
     setIsFetchingUserRepos(true);
     try {

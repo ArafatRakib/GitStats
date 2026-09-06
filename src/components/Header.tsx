@@ -52,7 +52,32 @@ export function Header({
   onThemeChange,
 }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [inputVal, setInputVal] = useState(`${owner}/${repo}`);
+  const [inputVal, setInputVal] = useState(owner && repo ? `${owner}/${repo}` : '');
+
+  // Manage Recent Search History via localStorage
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('gitstats_recent_searches');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const saveRecentSearch = (item: string) => {
+    if (!item || !item.trim()) return;
+    const cleanItem = item.trim();
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((s) => s.toLowerCase() !== cleanItem.toLowerCase());
+      const updated = [cleanItem, ...filtered].slice(0, 5); // Keep top 5
+      try {
+        localStorage.setItem('gitstats_recent_searches', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Failed to save search history', e);
+      }
+      return updated;
+    });
+  };
 
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -62,9 +87,23 @@ export function Header({
     const parts = trimmed.split('/');
     if (parts.length === 2 && parts[0] && parts[1]) {
       onChangeRepo(parts[0], parts[1]);
+      saveRecentSearch(`${parts[0]}/${parts[1]}`);
       setIsSearchOpen(false);
     } else if (parts.length === 1 && parts[0]) {
       onUserLookup(parts[0]);
+      saveRecentSearch(parts[0]);
+    }
+  };
+
+  const handleSelectRecent = (recentItem: string) => {
+    const parts = recentItem.split('/');
+    if (parts.length === 2) {
+      onChangeRepo(parts[0], parts[1]);
+      setInputVal(recentItem);
+      setIsSearchOpen(false);
+    } else {
+      onUserLookup(parts[0]);
+      setInputVal(parts[0]);
     }
   };
 
@@ -206,16 +245,16 @@ export function Header({
           </div>
         </div>
 
-{/* Dedicated Mobile Search Row (Only visible when active on small screens) */}
+        {/* Dedicated Mobile Search Row (Responsive wrap to prevent right-edge clipping) */}
         {isSearchOpen && (
-          <div className="py-2 border-t border-slate-100 dark:border-slate-800/80 animate-in fade-in duration-150 flex items-center gap-2">
-            <form onSubmit={handleSearchSubmit} className="flex items-center flex-1">
+          <div className="py-2 border-t border-slate-100 dark:border-slate-800/80 animate-in fade-in duration-150 flex flex-wrap sm:flex-nowrap items-center gap-2">
+            <form onSubmit={handleSearchSubmit} className="flex items-center flex-1 min-w-[220px]">
               <input
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="owner or owner/repo"
-                className="flex-1 px-3 py-1.5 text-xs rounded-l-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono min-h-[38px] touch-manipulation"
+                className="flex-1 min-w-0 px-3 py-1.5 text-xs rounded-l-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono min-h-[38px] touch-manipulation"
                 autoFocus
                 autoCapitalize="none"
                 autoComplete="off"
@@ -225,27 +264,27 @@ export function Header({
               <button
                 type="submit"
                 disabled={isFetchingUserRepos}
-                className="px-4 py-1.5 text-xs bg-indigo-600 text-white rounded-r-lg font-medium hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-50 min-h-[38px] touch-manipulation transition-colors shrink-0"
+                className="px-3.5 py-1.5 text-xs bg-indigo-600 text-white font-medium hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-50 min-h-[38px] touch-manipulation transition-colors shrink-0"
               >
                 {isFetchingUserRepos ? '...' : 'Go'}
               </button>
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="ml-2 p-2 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 min-h-[38px] min-w-[38px] flex items-center justify-center touch-manipulation shrink-0"
+                className="px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 min-h-[38px] flex items-center justify-center touch-manipulation shrink-0 border-r border-y border-slate-300 dark:border-slate-700 rounded-r-lg bg-slate-50 dark:bg-slate-800"
                 aria-label="Cancel search"
               >
                 ✕
               </button>
             </form>
 
-            {/* If user repos are populated during active search, render dropdown beside mobile search bar */}
+            {/* Repository selector dropdown constrained to fit viewport width */}
             {userRepos.length > 0 && (
               <select
                 id="select-user-repo-mobile"
                 value={repo}
                 onChange={(e) => onChangeRepo(owner, e.target.value)}
-                className="px-2.5 py-1.5 text-xs rounded-lg border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-900 dark:text-indigo-200 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[130px] min-h-[38px] touch-manipulation cursor-pointer font-medium shadow-2xs"
+                className="flex-1 sm:flex-none px-2.5 py-1.5 text-xs rounded-lg border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-900 dark:text-indigo-200 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-full sm:max-w-[160px] min-h-[38px] touch-manipulation cursor-pointer font-medium shadow-2xs"
                 title="Select Public Repository"
               >
                 {userRepos.map((r) => (
@@ -258,6 +297,24 @@ export function Header({
           </div>
         )}
 
+        {/* Recently Searched Repositories / User Quick-Switch Chips */}
+        {isSearchOpen && recentSearches.length > 0 && (
+          <div className="pb-2.5 pt-1 flex items-center gap-1.5 overflow-x-auto touch-pan-x whitespace-nowrap scrollbar-none animate-in fade-in">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 pr-1">
+              Recent:
+            </span>
+            {recentSearches.map((item) => (
+              <button
+                key={item}
+                onClick={() => handleSelectRecent(item)}
+                className="inline-flex items-center space-x-1 px-2.5 py-1 text-[11px] font-mono font-medium rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/80 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 transition-colors shrink-0 touch-manipulation"
+              >
+                <span>{item}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        
       </div>
     </header>
   );

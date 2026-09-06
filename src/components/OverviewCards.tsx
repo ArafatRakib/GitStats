@@ -1,6 +1,9 @@
 import { Download, TrendingUp, Tag, Laptop, Layers, Smartphone, Apple, Terminal, Star, GitFork, ExternalLink } from 'lucide-react';
 import { GitHubRelease, DownloadSnapshot, GitHubRepoInfo } from '../types';
 
+import { useState, useEffect } from 'react';
+import { Eye, Users } from 'lucide-react';
+
 interface OverviewCardsProps {
   releases: GitHubRelease[];
   snapshots: DownloadSnapshot[];
@@ -10,6 +13,47 @@ interface OverviewCardsProps {
 }
 
 export function OverviewCards({ releases, snapshots, repoInfo, owner, repo }: OverviewCardsProps) {
+  const [siteViews, setSiteViews] = useState<number | null>(null);
+  const [uniqueVisitors, setUniqueVisitors] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const namespace = 'gitstats_app_analytics';
+    
+    // Fetch total page views
+    fetch(`https://api.countapi.xyz/hit/${namespace}/visits`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data.value) setSiteViews(data.value);
+      })
+      .catch(() => {});
+
+    // Track unique visitors via local storage flag
+    const hasVisited = localStorage.getItem('gitstats_unique_visitor');
+    if (!hasVisited) {
+      fetch(`https://api.countapi.xyz/hit/${namespace}/uniques`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (isMounted && data.value) {
+            setUniqueVisitors(data.value);
+            localStorage.setItem('gitstats_unique_visitor', 'true');
+          }
+        })
+        .catch(() => {});
+    } else {
+      fetch(`https://api.countapi.xyz/get/${namespace}/uniques`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (isMounted && data.value) setUniqueVisitors(data.value);
+        })
+        .catch(() => {});
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  
   const totalDownloads = releases.reduce((sum, r) => sum + r.total_downloads, 0);
   const totalAssets = releases.reduce((sum, r) => sum + r.assets.length, 0);
 
@@ -207,6 +251,38 @@ export function OverviewCards({ releases, snapshots, repoInfo, owner, repo }: Ov
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             {totalAssets} assets • avg {releases.length ? Math.round(totalDownloads / releases.length).toLocaleString() : 0} dl/rel
           </p>
+        </div>
+      </div>
+
+      {/* 6. Site Visitors & Uniques */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden transition-colors sm:col-span-2 lg:col-span-5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>GitStats App Visitor Analytics</span>
+          </span>
+          <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/60">
+            Live Hits
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Total Page Visits</div>
+            <div className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-mono mt-0.5">
+              {siteViews !== null ? siteViews.toLocaleString() : '...'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Users className="w-3 h-3 text-indigo-500" />
+              <span>Unique Visitors</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono mt-0.5">
+              {uniqueVisitors !== null ? uniqueVisitors.toLocaleString() : '...'}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -15,36 +15,39 @@ export function BadgeGeneratorModal({ owner, repo, releases, isOpen, onClose }: 
 
   if (!isOpen) return null;
 
-  const totalDownloads = releases.reduce((sum, r) => sum + r.total_downloads, 0);
-  const latestTag = releases[0]?.tag_name || 'latest';
+  const targetOwner = owner || 'owner';
+  const targetRepo = repo || 'repo';
+  const appUrl = owner && repo 
+    ? `https://arafatrakib.github.io/GitStats/?repo=${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+    : 'https://arafatrakib.github.io/GitStats/';
 
   const badges = [
     {
       title: 'Total Downloads (All Releases)',
-      previewUrl: `https://img.shields.io/github/downloads/${owner}/${repo}/total?color=indigo&logo=github&style=flat-square`,
-      markdown: `![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/${owner}/${repo}/total?color=indigo&logo=github&style=flat-square)`,
-      html: `<img src="https://img.shields.io/github/downloads/${owner}/${repo}/total?color=indigo&logo=github&style=flat-square" alt="Total Downloads" />`,
+      previewUrl: `https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/total?color=indigo&logo=github&style=flat-square`,
+      markdown: `[![GitHub Downloads](${`https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/total?color=indigo&logo=github&style=flat-square`})](${appUrl})`,
+      html: `<a href="${appUrl}"><img src="https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/total?color=indigo&logo=github&style=flat-square" alt="Total Downloads" /></a>`,
     },
     {
       title: 'Latest Release Downloads',
-      previewUrl: `https://img.shields.io/github/downloads/${owner}/${repo}/latest/total?color=emerald&logo=github&style=flat-square`,
-      markdown: `![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/${owner}/${repo}/latest/total?color=emerald&logo=github&style=flat-square)`,
-      html: `<img src="https://img.shields.io/github/downloads/${owner}/${repo}/latest/total?color=emerald&logo=github&style=flat-square" alt="Latest Downloads" />`,
+      previewUrl: `https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/latest/total?color=emerald&logo=github&style=flat-square`,
+      markdown: `[![GitHub Downloads (latest)](${`https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/latest/total?color=emerald&logo=github&style=flat-square`})](${appUrl})`,
+      html: `<a href="${appUrl}"><img src="https://img.shields.io/github/downloads/${targetOwner}/${targetRepo}/latest/total?color=emerald&logo=github&style=flat-square" alt="Latest Downloads" /></a>`,
     },
     {
       title: 'Latest Version Tag',
-      previewUrl: `https://img.shields.io/github/v/release/${owner}/${repo}?color=blue&logo=github&style=flat-square`,
-      markdown: `![GitHub Release](https://img.shields.io/github/v/release/${owner}/${repo}?color=blue&logo=github&style=flat-square)`,
-      html: `<img src="https://img.shields.io/github/v/release/${owner}/${repo}?color=blue&logo=github&style=flat-square" alt="Release Version" />`,
+      previewUrl: `https://img.shields.io/github/v/release/${targetOwner}/${targetRepo}?color=blue&logo=github&style=flat-square`,
+      markdown: `[![GitHub Release](${`https://img.shields.io/github/v/release/${targetOwner}/${targetRepo}?color=blue&logo=github&style=flat-square`})](${appUrl})`,
+      html: `<a href="${appUrl}"><img src="https://img.shields.io/github/v/release/${targetOwner}/${targetRepo}?color=blue&logo=github&style=flat-square" alt="Release Version" /></a>`,
     },
     {
-      title: 'License & Platform',
+      title: 'Platform Support',
       previewUrl: `https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`,
-      markdown: `![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)`,
-      html: `<img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform" />`,
+      markdown: `[![Platform](${`https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`})](${appUrl})`,
+      html: `<a href="${appUrl}"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform" /></a>`,
     },
   ];
-
+  
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
