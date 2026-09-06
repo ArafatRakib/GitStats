@@ -8,7 +8,7 @@ export interface GitHubAsset {
   created_at: string;
   updated_at: string;
   browser_download_url: string;
-  os?: 'Android' | 'iOS' | 'Windows' | 'macOS' | 'Linux' | 'Source' | 'Other';
+  os?: 'Android' | 'iOS' | 'HarmonyOS' | 'Windows' | 'macOS' | 'Linux' | 'FreeBSD' | 'Solaris' | 'ChromeOS' | 'Source' | 'Other';
 }
 
 export interface GitHubRelease {

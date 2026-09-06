@@ -1,8 +1,17 @@
 import { GitHubAsset, GitHubRelease, GitHubRepoInfo, RateLimitInfo, TrafficData } from '../types';
 
-export function detectOS(filename: string): 'Android' | 'iOS' | 'Windows' | 'macOS' | 'Linux' | 'Source' | 'Other' {
+export function detectOS(filename: string): 'Android' | 'iOS' | 'HarmonyOS' | 'Windows' | 'macOS' | 'Linux' | 'FreeBSD' | 'Solaris' | 'ChromeOS' | 'Source' | 'Other' {
   const lower = filename.toLowerCase();
   
+  // HarmonyOS detection (.hap, .app, or harmony keywords)
+  if (
+    lower.endsWith('.hap') ||
+    lower.includes('harmonyos') ||
+    lower.includes('harmony')
+  ) {
+    return 'HarmonyOS';
+  }
+
   // Android detection (.apk, .aab, .xapk, or android keywords)
   if (
     lower.endsWith('.apk') ||
@@ -46,6 +55,32 @@ export function detectOS(filename: string): 'Android' | 'iOS' | 'Windows' | 'mac
     return 'macOS';
   }
 
+  // FreeBSD / OpenBSD / NetBSD
+  if (
+    lower.includes('freebsd') ||
+    lower.includes('openbsd') ||
+    lower.includes('netbsd')
+  ) {
+    return 'FreeBSD';
+  }
+
+  // Solaris / SunOS
+  if (
+    lower.includes('solaris') ||
+    lower.includes('sunos')
+  ) {
+    return 'Solaris';
+  }
+
+  // ChromeOS / ChromiumOS
+  if (
+    lower.includes('chromeos') ||
+    lower.includes('chromiumos') ||
+    lower.includes('chromebook')
+  ) {
+    return 'ChromeOS';
+  }
+
   // Linux detection
   if (
     lower.endsWith('.deb') ||
@@ -58,7 +93,8 @@ export function detectOS(filename: string): 'Android' | 'iOS' | 'Windows' | 'mac
     lower.includes('linux') ||
     lower.includes('ubuntu') ||
     lower.includes('arch') ||
-    lower.includes('fedora')
+    lower.includes('fedora') ||
+    lower.includes('alpine')
   ) {
     return 'Linux';
   }
@@ -66,6 +102,7 @@ export function detectOS(filename: string): 'Android' | 'iOS' | 'Windows' | 'mac
   // Generic Archives & Source
   if (lower.endsWith('.zip') || lower.endsWith('.tar')) {
     if (lower.includes('android')) return 'Android';
+    if (lower.includes('harmony')) return 'HarmonyOS';
     if (lower.includes('win')) return 'Windows';
     if (lower.includes('mac') || lower.includes('apple')) return 'macOS';
     if (lower.includes('linux')) return 'Linux';

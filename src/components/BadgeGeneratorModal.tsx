@@ -42,9 +42,9 @@ export function BadgeGeneratorModal({ owner, repo, releases, isOpen, onClose }: 
     },
     {
       title: 'Platform Support',
-      previewUrl: `https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`,
-      markdown: `[![Platform](${`https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`})](${appUrl})`,
-      html: `<a href="${appUrl}"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform" /></a>`,
+      previewUrl: `https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20HarmonyOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`,
+      markdown: `[![Platform](${`https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20HarmonyOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square`})](${appUrl})`,
+      html: `<a href="${appUrl}"><img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20HarmonyOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform" /></a>`,
     },
   ];
   
